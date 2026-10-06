@@ -2,279 +2,312 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-/* -------------------------------------------------------------------------- */
-/* STAR DATA                                                                  */
-/* -------------------------------------------------------------------------- */
+gsap.registerPlugin(ScrollTrigger);
 
-const stars = Array.from({ length: 220 }, (_, i) => {
-  const x = (i * 47.37) % 100;
-  const y = (i * 71.83) % 100;
+type Star = {
+  el: HTMLDivElement;
+  x: number;
+  y: number;
+  z: number;
+  baseZ: number;
+  size: number;
+  speed: number;
+};
 
-  // Distance from the center / vanishing point.
-  const dx = x - 50;
-  const dy = y - 50;
-
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  return {
-    id: i,
-    left: `${x}%`,
-    top: `${y}%`,
-
-    dx,
-    dy,
-
-    // 0 = center
-    // 1 = far from center
-    depth: Math.min(1, distance / 70),
-
-    size: i % 9 === 0 ? 2 : i % 3 === 0 ? 1.5 : 1,
-
-    opacity: 0.2 + ((i * 13) % 65) / 100,
-  };
-});
-
-/* -------------------------------------------------------------------------- */
-/* SPACE BACKGROUND                                                           */
-/* -------------------------------------------------------------------------- */
+const STAR_COUNT = 220;
+const MAX_DEPTH = 1800;
+const MIN_DEPTH = 20;
 
 export default function SpaceBackground() {
-  const starRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const starsRef = useRef<Star[]>([]);
 
   useEffect(() => {
-    const animations: gsap.core.Timeline[] = [];
+    const container = containerRef.current;
 
-    starRefs.current.forEach((star, index) => {
-      if (!star) return;
+    if (!container) return;
 
-      const data = stars[index];
+    const stars: Star[] = [];
 
-      const distance = Math.sqrt(data.dx * data.dx + data.dy * data.dy);
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE STARFIELD
+    |--------------------------------------------------------------------------
+    */
 
-      if (distance === 0) return;
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const star = document.createElement("div");
+
+      star.className = "absolute rounded-full bg-white pointer-events-none";
+
+      const size = 1 + Math.random() * 2;
+
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+
+      container.appendChild(star);
+
+      const starData: Star = {
+        el: star,
+
+        // Position relative to the center of the viewport
+        x: (Math.random() - 0.5) * window.innerWidth * 2.5,
+        y: (Math.random() - 0.5) * window.innerHeight * 2.5,
+
+        // Initial depth
+        z: MIN_DEPTH + Math.random() * MAX_DEPTH,
+
+        baseZ: MIN_DEPTH + Math.random() * MAX_DEPTH,
+
+        size,
+
+        // Individual star speed
+        speed: 0.7 + Math.random() * 1.8,
+      };
+
+      stars.push(starData);
+    }
+
+    starsRef.current = stars;
+
+    /*
+    |--------------------------------------------------------------------------
+    | RENDER STAR
+    |--------------------------------------------------------------------------
+    */
+
+    const renderStar = (star: Star) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
 
       /*
-       * Direction away from the center.
-       */
-      const dirX = data.dx / distance;
-      const dirY = data.dy / distance;
-
-      /*
-       * How far the star travels before disappearing.
+       * Perspective projection.
        *
-       * Stars near the center travel farther.
-       * Stars already near the edge need less travel.
+       * As Z becomes smaller, the star appears
+       * larger and farther away from the center.
        */
-      const travel = 600 + (1 - data.depth) * 1000;
+
+      const perspective = 900;
+
+      const scale = perspective / star.z;
+
+      const screenX = centerX + star.x * scale;
+      const screenY = centerY + star.y * scale;
 
       /*
-       * Slightly different speeds prevent the entire
-       * starfield from looking synchronized.
+       * If the star gets too close to the camera,
+       * recycle it to the far distance.
        */
-      const duration = 1.8 + data.depth * 2 + ((index * 19) % 100) / 100;
+
+      if (
+        screenX < -200 ||
+        screenX > window.innerWidth + 200 ||
+        screenY < -200 ||
+        screenY > window.innerHeight + 200
+      ) {
+        star.z = MAX_DEPTH;
+      }
 
       /*
-       * Deterministic stagger.
-       *
-       * No Math.random() is used, so hydration remains safe.
+       * Opacity increases as the star approaches.
        */
-      const delay = (((index * 41.37) % 100) / 100) * duration;
 
-      const timeline = gsap.timeline({
-        repeat: -1,
-        delay,
+      const opacity = Math.min(1, Math.max(0.15, 1 - star.z / MAX_DEPTH));
+
+      /*
+       * Star size increases dramatically near camera.
+       */
+
+      const projectedSize = Math.max(1, star.size * scale);
+
+      star.el.style.transform = `
+        translate3d(
+          ${screenX}px,
+          ${screenY}px,
+          0
+        )
+        translate(-50%, -50%)
+      `;
+
+      star.el.style.width = `${projectedSize}px`;
+      star.el.style.height = `${projectedSize}px`;
+      star.el.style.opacity = `${opacity}`;
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | INITIAL RENDER
+    |--------------------------------------------------------------------------
+    */
+
+    stars.forEach(renderStar);
+
+    /*
+    |--------------------------------------------------------------------------
+    | ANIMATION LOOP
+    |--------------------------------------------------------------------------
+    */
+
+    let animationFrame = 0;
+
+    const animate = () => {
+      stars.forEach((star) => {
+        /*
+         * Forward camera movement.
+         *
+         * Smaller Z = closer to camera.
+         */
+
+        star.z -= star.speed;
+
+        /*
+         * Recycle stars after passing the camera.
+         */
+
+        if (star.z <= MIN_DEPTH) {
+          star.z = MAX_DEPTH;
+
+          star.x = (Math.random() - 0.5) * window.innerWidth * 2.5;
+
+          star.y = (Math.random() - 0.5) * window.innerHeight * 2.5;
+        }
+
+        renderStar(star);
       });
 
-      /*
-       * --------------------------------------------------------------
-       * STAR LIFECYCLE
-       * --------------------------------------------------------------
-       *
-       *        center
-       *           ●
-       *          ↗
-       *       ↗
-       *    ✦
-       *
-       * Star appears near the center,
-       * accelerates outward,
-       * stretches visually,
-       * disappears,
-       * then starts again from the center.
-       */
+      animationFrame = requestAnimationFrame(animate);
+    };
 
-      timeline
-        /*
-         * Reset to the vanishing point.
-         */
-        .set(star, {
-          x: 0,
-          y: 0,
-          scale: 0.25,
-          opacity: 0,
-        })
+    /*
+    |--------------------------------------------------------------------------
+    | START
+    |--------------------------------------------------------------------------
+    */
 
+    animate();
+
+    /*
+    |--------------------------------------------------------------------------
+    | SCROLL SPEED CONTROL
+    |--------------------------------------------------------------------------
+    */
+
+    const speedController = {
+      value: 1,
+    };
+
+    const scrollTrigger = ScrollTrigger.create({
+      trigger: container,
+      start: "top top",
+      end: "+=9000",
+      scrub: true,
+
+      onUpdate: (self) => {
         /*
-         * Star emerges from deep space.
+         * 0 → 1
          */
-        .to(star, {
-          opacity: data.opacity * 0.75,
-          scale: 0.8,
-          duration: duration * 0.18,
-          ease: "power2.out",
-        })
+        const progress = self.progress;
 
         /*
-         * Star accelerates toward the viewer.
+         * Ease the acceleration.
+         *
+         * At the beginning the stars move slowly.
+         * Toward the middle they accelerate.
          */
-        .to(star, {
-          x: dirX * travel,
-          y: dirY * travel,
-          scale: 2.5 + data.depth * 3,
-          opacity: 0,
-          duration: duration * 0.82,
-          ease: "power3.in",
+
+        const targetSpeed = 0.15 + Math.pow(progress, 1.8) * 18;
+
+        gsap.to(speedController, {
+          value: targetSpeed,
+          duration: 0.25,
+          overwrite: true,
         });
-
-      animations.push(timeline);
+      },
     });
 
-    return () => {
-      animations.forEach((animation) => {
-        animation.kill();
+    /*
+    |--------------------------------------------------------------------------
+    | APPLY SCROLL SPEED
+    |--------------------------------------------------------------------------
+    */
+
+    const originalAnimate = animate;
+
+    // Override the movement loop with scroll-controlled speed
+    cancelAnimationFrame(animationFrame);
+
+    const flightLoop = () => {
+      stars.forEach((star) => {
+        star.z -= star.speed * speedController.value;
+
+        /*
+         * Recycle star after passing camera.
+         */
+
+        if (star.z <= MIN_DEPTH) {
+          star.z = MAX_DEPTH;
+
+          star.x = (Math.random() - 0.5) * window.innerWidth * 2.5;
+
+          star.y = (Math.random() - 0.5) * window.innerHeight * 2.5;
+        }
+
+        renderStar(star);
       });
+
+      animationFrame = requestAnimationFrame(flightLoop);
+    };
+
+    flightLoop();
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESIZE
+    |--------------------------------------------------------------------------
+    */
+
+    const handleResize = () => {
+      stars.forEach((star) => {
+        renderStar(star);
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLEANUP
+    |--------------------------------------------------------------------------
+    */
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+
+      scrollTrigger.kill();
+
+      window.removeEventListener("resize", handleResize);
+
+      stars.forEach((star) => {
+        star.el.remove();
+      });
+
+      starsRef.current = [];
     };
   }, []);
 
   return (
     <div
+      ref={containerRef}
       className="
-        pointer-events-none
         fixed
         inset-0
-        z-0
         overflow-hidden
+        pointer-events-none
         bg-[#02030a]
+        z-0
       "
-      aria-hidden="true"
-    >
-      {/* ------------------------------------------------------------------ */}
-      {/* BLUE ATMOSPHERE                                                     */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div
-        className="
-          absolute
-          left-1/2
-          top-[42%]
-          h-[65vh]
-          w-[65vw]
-          -translate-x-1/2
-          -translate-y-1/2
-          rounded-full
-          bg-blue-700/10
-          blur-[130px]
-        "
-      />
-
-      {/* ------------------------------------------------------------------ */}
-      {/* VIOLET ATMOSPHERE                                                   */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div
-        className="
-          absolute
-          right-[-10%]
-          top-[25%]
-          h-[50vh]
-          w-[45vw]
-          rounded-full
-          bg-violet-700/10
-          blur-[130px]
-        "
-      />
-
-      {/* ------------------------------------------------------------------ */}
-      {/* STARFIELD                                                           */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div className="absolute inset-0 overflow-hidden">
-        {stars.map((star, index) => (
-          <span
-            key={star.id}
-            ref={(element) => {
-              starRefs.current[index] = element;
-            }}
-            className="
-              absolute
-              rounded-full
-              bg-white
-              will-change-transform
-            "
-            style={{
-              left: star.left,
-              top: star.top,
-              width: star.size,
-              height: star.size,
-              opacity: star.opacity,
-              boxShadow:
-                star.size >= 2 ? "0 0 8px rgba(255,255,255,0.65)" : "none",
-            }}
-          />
-        ))}
-      </div>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* NEBULA STREAK                                                       */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div
-        className="
-          absolute
-          left-[-20%]
-          top-[42%]
-          h-px
-          w-[140%]
-          rotate-[-8deg]
-          bg-gradient-to-r
-          from-transparent
-          via-cyan-400/20
-          to-transparent
-          blur-[2px]
-        "
-      />
-
-      {/* ------------------------------------------------------------------ */}
-      {/* GLOBAL VIGNETTE                                                     */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div
-        className="
-          absolute
-          inset-0
-          bg-[radial-gradient(circle_at_center,transparent_25%,rgba(2,3,10,0.25)_65%,rgba(0,0,0,0.7)_100%)]
-        "
-      />
-
-      {/* ------------------------------------------------------------------ */}
-      {/* CENTRAL CAMERA GLOW                                                 */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div
-        className="
-          absolute
-          left-1/2
-          top-1/2
-          h-[20vh]
-          w-[20vw]
-          -translate-x-1/2
-          -translate-y-1/2
-          rounded-full
-          bg-cyan-400/[0.025]
-          blur-[100px]
-        "
-      />
-    </div>
+    />
   );
 }

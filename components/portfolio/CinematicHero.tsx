@@ -20,38 +20,44 @@ type Destination = {
   status: string;
 };
 
-const destinations: Destination[] = [
+/* -------------------------------------------------------------------------- */
+/* STATIC DATA                                                                */
+/* -------------------------------------------------------------------------- */
+
+const systemSequence: SystemStatus[] = [
   {
-    name: "NEBULA NX-07",
-    code: "NX-07",
-    distance: "1,240 LY",
-    status: "READY",
+    name: "EXPLORATION CORE",
+    label: "INITIALIZING",
+    percent: 100,
   },
   {
-    name: "ORION OR-19",
-    code: "OR-19",
-    distance: "1,344 LY",
-    status: "READY",
+    name: "NAVIGATION ARRAY",
+    label: "ONLINE",
+    percent: 82,
   },
   {
-    name: "ANDROMEDA AD-01",
-    code: "AD-01",
-    distance: "2.53 MLY",
-    status: "READY",
+    name: "LIFE SUPPORT",
+    label: "STABLE",
+    percent: 96,
   },
   {
-    name: "VEGA VG-12",
-    code: "VG-12",
-    distance: "25.04 LY",
-    status: "READY",
+    name: "PROPULSION SYSTEM",
+    label: "STANDBY",
+    percent: 68,
   },
   {
-    name: "LYRA LY-08",
-    code: "LY-08",
-    distance: "620 LY",
-    status: "READY",
+    name: "FLIGHT CONTROL",
+    label: "READY",
+    percent: 100,
   },
 ];
+
+const selectedDestination: Destination = {
+  name: "NEBULA NX-07",
+  code: "NX-07",
+  distance: "1,240 LY",
+  status: "READY",
+};
 
 /* -------------------------------------------------------------------------- */
 /* HUD CORNERS                                                                */
@@ -100,22 +106,16 @@ function Spacecraft() {
       {/* Atmospheric glow */}
       <div className="absolute left-1/2 top-[55%] h-[220px] w-[430px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-500/10 blur-[80px]" />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* ENGINE EXHAUST                                                     */}
-      {/* ------------------------------------------------------------------ */}
-
+      {/* ENGINE EXHAUST */}
       <div className="engine-glow absolute left-1/2 top-[76%] z-0 flex -translate-x-1/2 gap-5">
-        <div className="engine-flame h-[100px] w-[48px] rounded-b-[30px] bg-gradient-to-b from-white via-cyan-300 to-blue-600 opacity-0 blur-[7px]" />
+        <div className="engine-flame h-[100px] w-[48px] origin-top rounded-b-[30px] bg-gradient-to-b from-white via-cyan-300 to-blue-600 opacity-0 blur-[7px]" />
 
-        <div className="engine-flame h-[120px] w-[55px] rounded-b-[35px] bg-gradient-to-b from-white via-cyan-300 to-blue-600 opacity-0 blur-[8px]" />
+        <div className="engine-flame h-[120px] w-[55px] origin-top rounded-b-[35px] bg-gradient-to-b from-white via-cyan-300 to-blue-600 opacity-0 blur-[8px]" />
 
-        <div className="engine-flame h-[100px] w-[48px] rounded-b-[30px] bg-gradient-to-b from-white via-cyan-300 to-blue-600 opacity-0 blur-[7px]" />
+        <div className="engine-flame h-[100px] w-[48px] origin-top rounded-b-[30px] bg-gradient-to-b from-white via-cyan-300 to-blue-600 opacity-0 blur-[7px]" />
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* MAIN SHIP                                                           */}
-      {/* ------------------------------------------------------------------ */}
-
+      {/* MAIN SHIP */}
       <div className="ship-body absolute left-1/2 top-1/2 z-10 h-[145px] w-[300px] -translate-x-1/2 -translate-y-1/2">
         {/* Left wing */}
         <div
@@ -350,15 +350,9 @@ function PilotProfile() {
 
         <div className="pointer-events-none absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent" />
 
-        <div
-          className="
-            mb-5 flex items-center justify-between
-            border-b border-cyan-300/10 pb-3
-            sm:mb-7 sm:pb-4
-          "
-        >
+        <div className="mb-5 flex items-center justify-between border-b border-cyan-300/10 pb-3 sm:mb-7 sm:pb-4">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.9)] sm:h-2.5 sm:w-2.5" />
+            <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.9)] sm:h-2.5 sm:w-2.5" />
 
             <span className="truncate font-mono text-[9px] tracking-[0.25em] text-cyan-200/90 sm:text-sm sm:tracking-[0.4em]">
               PILOT IDENTIFICATION
@@ -370,22 +364,9 @@ function PilotProfile() {
           </span>
         </div>
 
-        <div
-          className="
-            flex flex-col items-center gap-7
-            sm:gap-8
-            md:flex-row md:items-center md:gap-10
-          "
-        >
+        <div className="flex flex-col items-center gap-7 sm:gap-8 md:flex-row md:items-center md:gap-10">
           {/* Profile image */}
-          <div
-            className="
-              relative
-              h-[150px] w-[150px] shrink-0
-              sm:h-[180px] sm:w-[180px]
-              md:h-[220px] md:w-[220px]
-            "
-          >
+          <div className="relative h-[150px] w-[150px] shrink-0 sm:h-[180px] sm:w-[180px] md:h-[220px] md:w-[220px]">
             <div className="absolute inset-0 border border-cyan-300/20" />
 
             <div className="absolute -left-2 -top-2 h-6 w-6 border-l-2 border-t-2 border-cyan-300/80 sm:-left-3 sm:-top-3 sm:h-8 sm:w-8" />
@@ -404,47 +385,13 @@ function PilotProfile() {
                 />
               </div>
 
-              <div
-                className="
-                  pointer-events-none absolute inset-0 z-10
-                  opacity-30
-                  bg-[repeating-linear-gradient(to_bottom,transparent_0px,transparent_3px,rgba(103,232,249,0.08)_4px,transparent_5px)]
-                "
-              />
+              <div className="pointer-events-none absolute inset-0 z-10 opacity-30 bg-[repeating-linear-gradient(to_bottom,transparent_0px,transparent_3px,rgba(103,232,249,0.08)_4px,transparent_5px)]" />
 
-              <div
-                className="
-                  pointer-events-none absolute
-                  left-0 top-[-25%]
-                  z-20
-                  h-[20%] w-full
-                  animate-[profileScan_3.6s_linear_infinite]
-                  bg-gradient-to-b
-                  from-transparent
-                  via-cyan-300/20
-                  to-transparent
-                  shadow-[0_0_18px_rgba(34,211,238,0.25)]
-                "
-              />
+              <div className="pointer-events-none absolute left-0 top-[-25%] z-20 h-[20%] w-full bg-gradient-to-b from-transparent via-cyan-300/20 to-transparent shadow-[0_0_18px_rgba(34,211,238,0.25)]" />
 
-              <div
-                className="
-                  pointer-events-none absolute
-                  left-0 top-[-25%]
-                  z-20
-                  h-px w-full
-                  animate-[profileScanLine_3.6s_linear_infinite]
-                  bg-cyan-300/70
-                  shadow-[0_0_8px_rgba(103,232,249,0.9)]
-                "
-              />
+              <div className="pointer-events-none absolute left-0 top-[-25%] z-20 h-px w-full bg-cyan-300/70 shadow-[0_0_8px_rgba(103,232,249,0.9)]" />
 
-              <div
-                className="
-                  pointer-events-none absolute inset-0 z-30
-                  bg-[radial-gradient(circle,transparent_45%,rgba(8,145,178,0.10)_75%,rgba(2,3,10,0.28)_100%)]
-                "
-              />
+              <div className="pointer-events-none absolute inset-0 z-30 bg-[radial-gradient(circle,transparent_45%,rgba(8,145,178,0.10)_75%,rgba(2,3,10,0.28)_100%)]" />
 
               <div className="pointer-events-none absolute inset-0 z-30 bg-cyan-400/[0.025]" />
             </div>
@@ -505,7 +452,7 @@ function PilotProfile() {
                 </div>
 
                 <div className="mt-1 flex items-center justify-center gap-2 font-mono text-[10px] tracking-[0.12em] text-cyan-300 md:justify-start sm:text-sm sm:tracking-[0.16em]">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]" />
                   ACTIVE
                 </div>
               </div>
@@ -542,8 +489,12 @@ function PilotProfile() {
 export default function CinematicHero() {
   const root = useRef<HTMLElement>(null);
 
-  const [selectedDestination, setSelectedDestination] =
-    useState<Destination | null>(null);
+  const initialization = useRef<HTMLDivElement>(null);
+  const initializationBar = useRef<HTMLDivElement>(null);
+  const initializationPercent = useRef<HTMLDivElement>(null);
+  const initializationStatus = useRef<HTMLDivElement>(null);
+
+  const systemStatusPanel = useRef<HTMLDivElement>(null);
 
   const destinationPanel = useRef<HTMLDivElement>(null);
   const destinationName = useRef<HTMLDivElement>(null);
@@ -561,269 +512,140 @@ export default function CinematicHero() {
   const gpsScan = useRef<HTMLDivElement>(null);
 
   const scrollProgress = useRef<HTMLDivElement>(null);
+
   const welcomePassenger = useRef<HTMLDivElement>(null);
+  const pilotProfile = useRef<HTMLDivElement>(null);
+
   const ship = useRef<HTMLDivElement>(null);
   const shipGlow = useRef<HTMLDivElement>(null);
   const horizon = useRef<HTMLDivElement>(null);
-  const pilotProfile = useRef<HTMLDivElement>(null);
+
   const [audioOn, setAudioOn] = useState(false);
 
-  const [bootMessages, setBootMessages] = useState<SystemStatus[]>([]);
-
   useEffect(() => {
-    if (!gpsPanel.current) return;
+    if (!root.current) return;
 
     const ctx = gsap.context(() => {
-      const elements = [
-        gpsCoordinates.current,
-        gpsHeading.current,
-        gpsAltitude.current,
-        gpsVelocity.current,
-        gpsLock.current,
-      ].filter(Boolean);
+      /* -------------------------------------------------------------------- */
+      /* INITIAL STATE                                                        */
+      /* -------------------------------------------------------------------- */
 
-      gsap.set(elements, {
-        opacity: 0,
-        y: 6,
-      });
-
-      gsap.set(gpsScan.current, {
-        width: "0%",
-      });
-
-      const tl = gsap.timeline();
-
-      tl.to(gpsPanel.current, {
-        opacity: 1,
-        duration: 0.45,
-        ease: "power2.out",
-      })
-        .to(
-          gpsCoordinates.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            ease: "power3.out",
-          },
-          "-=0.15",
-        )
-        .to(
-          gpsHeading.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.35,
-            ease: "power3.out",
-          },
-          "-=0.2",
-        )
-        .to(
-          gpsAltitude.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.35,
-            ease: "power3.out",
-          },
-          "-=0.2",
-        )
-        .to(
-          gpsVelocity.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.35,
-            ease: "power3.out",
-          },
-          "-=0.2",
-        )
-        .to(
-          gpsLock.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.35,
-            ease: "power3.out",
-          },
-          "-=0.2",
-        )
-        .to(
-          gpsScan.current,
-          {
-            width: "100%",
-            duration: 1.5,
-            ease: "power3.inOut",
-          },
-          "-=0.1",
-        );
-
-      // Continuous navigation scan
-      gsap.to(gpsScan.current, {
-        opacity: 0.35,
-        duration: 0.9,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: 1.4,
-      });
-    }, gpsPanel);
-
-    return () => ctx.revert();
-  }, []);
-
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * destinations.length);
-    setSelectedDestination(destinations[randomIndex]);
-  }, []);
-
-  useEffect(() => {
-    if (!selectedDestination || !destinationPanel.current) return;
-
-    const ctx = gsap.context(() => {
-      const elements = [
-        destinationName.current,
-        destinationCode.current,
-        destinationDistance.current,
-        destinationStatus.current,
-      ].filter(Boolean);
-
-      gsap.set(elements, {
-        opacity: 0,
-        y: 8,
-      });
-
-      gsap.set(destinationBar.current, {
-        width: "0%",
-      });
-
-      const tl = gsap.timeline();
-
-      tl.to(destinationPanel.current, {
-        opacity: 1,
-        duration: 0.5,
-        ease: "power2.out",
-      })
-        .to(
-          destinationName.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.55,
-            ease: "power3.out",
-          },
-          "-=0.2",
-        )
-        .to(
-          destinationCode.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            ease: "power3.out",
-          },
-          "-=0.3",
-        )
-        .to(
-          destinationDistance.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.45,
-            ease: "power3.out",
-          },
-          "-=0.25",
-        )
-        .to(
-          destinationStatus.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            ease: "power3.out",
-          },
-          "-=0.2",
-        )
-        .to(
-          destinationBar.current,
-          {
-            width: "100%",
-            duration: 1.2,
-            ease: "power3.inOut",
-          },
-          "-=0.2",
-        );
-
-      // Subtle scanning pulse after initialization.
-      gsap.to(destinationBar.current, {
-        opacity: 0.45,
-        duration: 0.8,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: 1.2,
-      });
-    }, destinationPanel);
-
-    return () => {
-      ctx.revert();
-    };
-  }, [selectedDestination]);
-
-  useEffect(() => {
-    if (!root.current || !ship.current) return;
-
-    const ctx = gsap.context(() => {
-      const systemSequence = [
+      gsap.set(
+        [
+          initialization.current,
+          welcomePassenger.current,
+          pilotProfile.current,
+          ship.current,
+          shipGlow.current,
+          horizon.current,
+          systemStatusPanel.current,
+          destinationPanel.current,
+          gpsPanel.current,
+        ],
         {
-          name: "EXPLORATION CORE",
-          label: "INITIALIZING",
-          percent: 100,
+          opacity: 0,
         },
-        {
-          name: "NAVIGATION ARRAY",
-          label: "ONLINE",
-          percent: 82,
-        },
-        {
-          name: "LIFE SUPPORT",
-          label: "STABLE",
-          percent: 96,
-        },
-        {
-          name: "PROPULSION SYSTEM",
-          label: "STANDBY",
-          percent: 68,
-        },
-        {
-          name: "FLIGHT CONTROL",
-          label: "READY",
-          percent: 100,
-        },
-      ];
+      );
 
-      /* ------------------------------------------------------------------ */
-      /* INITIAL STATE                                                       */
-      /* ------------------------------------------------------------------ */
-
-      gsap.set(ship.current, {
-        y: 150,
-        scale: 0.82,
-        opacity: 0,
+      gsap.set(initialization.current, {
+        pointerEvents: "none",
       });
 
       gsap.set(welcomePassenger.current, {
-        opacity: 0,
         scale: 0.96,
         y: 10,
       });
 
       gsap.set(pilotProfile.current, {
-        opacity: 0,
         scale: 0.96,
         y: 10,
       });
 
+      gsap.set(ship.current, {
+        y: 120,
+        scale: 0.82,
+      });
+
+      gsap.set(shipGlow.current, {
+        opacity: 0,
+        scale: 0.8,
+      });
+
+      gsap.set(horizon.current, {
+        opacity: 0,
+        scaleY: 1,
+      });
+
+      gsap.set(systemStatusPanel.current, {
+        x: -20,
+      });
+
+      gsap.set(destinationPanel.current, {
+        x: 20,
+      });
+
+      gsap.set(gpsPanel.current, {
+        x: 0,
+        y: 15,
+      });
+
+      /* Initialization */
+      gsap.set(initializationBar.current, {
+        width: "0%",
+      });
+
+      if (initializationPercent.current) {
+        initializationPercent.current.textContent = "0%";
+      }
+
+      if (initializationStatus.current) {
+        initializationStatus.current.textContent = "INITIALIZING CORE SYSTEM";
+      }
+
+      /* System status rows */
+      gsap.set(".system-status-row", {
+        opacity: 0,
+        x: -20,
+      });
+
+      /* Destination */
+      gsap.set(
+        [
+          destinationName.current,
+          destinationCode.current,
+          destinationDistance.current,
+          destinationStatus.current,
+        ],
+        {
+          opacity: 0,
+          y: 12,
+        },
+      );
+
+      gsap.set(destinationBar.current, {
+        width: "0%",
+      });
+
+      /* GPS */
+      gsap.set(
+        [
+          gpsCoordinates.current,
+          gpsHeading.current,
+          gpsAltitude.current,
+          gpsVelocity.current,
+          gpsLock.current,
+        ],
+        {
+          opacity: 0,
+          y: 10,
+        },
+      );
+
+      gsap.set(gpsScan.current, {
+        width: "0%",
+      });
+
+      /* Ship lighting */
       gsap.set(".ship-light", {
         opacity: 0,
       });
@@ -832,6 +654,7 @@ export default function CinematicHero() {
         opacity: 0,
       });
 
+      /* Engines */
       gsap.set(".engine-core", {
         backgroundColor: "#334155",
         boxShadow: "none",
@@ -845,470 +668,485 @@ export default function CinematicHero() {
 
       gsap.set(".engine-glow", {
         opacity: 0,
+        scale: 1,
       });
 
-      gsap.set(shipGlow.current, {
-        opacity: 0,
+      /* -------------------------------------------------------------------- */
+      /* MASTER TIMELINE                                                      */
+      /* -------------------------------------------------------------------- */
+
+      const initState = {
+        value: 0,
+      };
+
+      const master = gsap.timeline({
+        scrollTrigger: {
+          trigger: root.current,
+          start: "top top",
+          end: "+=11000",
+          scrub: 1.5,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+
+          onUpdate: (self) => {
+            if (scrollProgress.current) {
+              gsap.set(scrollProgress.current, {
+                width: `${Math.max(4, self.progress * 100)}%`,
+              });
+            }
+          },
+        },
       });
 
-      gsap.set(horizon.current, {
-        opacity: 0,
-        scaleY: 1,
-      });
+      /* ==================================================================== */
+      /* FRAME 01 — SYSTEM INITIALIZATION                                    */
+      /* ==================================================================== */
 
-      /* ------------------------------------------------------------------ */
-      /* BOOT MESSAGES                                                       */
-      /* ------------------------------------------------------------------ */
-
-      let messageIndex = 0;
-
-      const messageTimer = window.setInterval(() => {
-        const system = systemSequence[messageIndex];
-
-        // Safety check: never add an undefined system
-        if (!system) {
-          window.clearInterval(messageTimer);
-          return;
-        }
-
-        setBootMessages((previous) => [...previous, system]);
-
-        messageIndex += 1;
-
-        if (messageIndex >= systemSequence.length) {
-          window.clearInterval(messageTimer);
-        }
-      }, 850);
-
-      /* ------------------------------------------------------------------ */
-      /* ENGINE IDLE                                                         */
-      /* ------------------------------------------------------------------ */
-
-      const engineIdle = gsap.to(".engine-flame", {
-        scaleY: 0.7,
-        opacity: 0.85,
-        duration: 0.32,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        paused: true,
-      });
-
-      /* ------------------------------------------------------------------ */
-      /* INTRO TIMELINE                                                      */
-      /* ------------------------------------------------------------------ */
-
-      const intro = gsap.timeline({
-        delay: 0.3,
-      });
-
-      /*
-       * SCENE 01
-       * Welcome.
-       */
-
-      intro
-        .to(welcomePassenger.current, {
+      master
+        .to(initialization.current, {
           opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 1.2,
-          ease: "power3.out",
+          duration: 0.4,
+          ease: "power2.out",
         })
 
-        .to(welcomePassenger.current, {
-          opacity: 1,
-          duration: 2,
-        })
+        .to(
+          initState,
+          {
+            value: 100,
+            duration: 3.5,
+            ease: "none",
 
-        .to(welcomePassenger.current, {
+            onUpdate: () => {
+              const value = Math.floor(initState.value);
+
+              if (initializationPercent.current) {
+                initializationPercent.current.textContent = `${value}%`;
+              }
+
+              if (initializationBar.current) {
+                gsap.set(initializationBar.current, {
+                  width: `${value}%`,
+                });
+              }
+
+              if (initializationStatus.current) {
+                const statuses = [
+                  "INITIALIZING CORE SYSTEM",
+                  "CHECKING NAVIGATION ARRAY",
+                  "VERIFYING LIFE SUPPORT",
+                  "CALIBRATING PROPULSION",
+                  "SYNCING FLIGHT CONTROL",
+                  "SYSTEMS NOMINAL",
+                ];
+
+                const index = Math.min(
+                  statuses.length - 1,
+                  Math.floor(value / 20),
+                );
+
+                initializationStatus.current.textContent = statuses[index];
+              }
+            },
+          },
+          "<",
+        )
+
+        /* Hold initialization */
+        .to(
+          {},
+          {
+            duration: 0.7,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 02 — WELCOME ABOARD                                           */
+      /* ==================================================================== */
+
+      master
+        .to(initialization.current, {
           opacity: 0,
-          scale: 1.02,
-          y: -10,
-          duration: 0.8,
-          ease: "power2.inOut",
-        });
+          duration: 0.35,
+          ease: "power2.in",
+        })
 
-      /*
-       * SCENE 02
-       * Pilot identification.
-       */
-
-      intro
-        .to(pilotProfile.current, {
+        .to(welcomePassenger.current, {
           opacity: 1,
           scale: 1,
           y: 0,
-          duration: 1.4,
+          duration: 0.8,
           ease: "power3.out",
         })
 
         .to(
           {},
           {
-            duration: 2.2,
+            duration: 1,
           },
         );
 
-      /*
-       * SCENE 03
-       * Ship reveal.
-       */
+      /* ==================================================================== */
+      /* FRAME 03 — PILOT IDENTIFICATION                                     */
+      /* ==================================================================== */
 
-      intro.to(ship.current, {
-        opacity: 1,
-        duration: 2.2,
-        ease: "power2.out",
-      });
-
-      /*
-       * SCENE 04
-       * Ship rises into its final center position.
-       */
-
-      intro.to(ship.current, {
-        y: 0,
-        scale: 1,
-        duration: 2.8,
-        ease: "power3.inOut",
-      });
-
-      /*
-       * SCENE 05
-       * Navigation lights.
-       */
-
-      intro.to(
-        ".nav-light-left, .nav-light-right",
-        {
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.2,
-        },
-        "-=0.7",
-      );
-
-      /*
-       * Body light.
-       */
-
-      intro.to(
-        ".ship-light",
-        {
-          opacity: 1,
-          duration: 1.2,
-          ease: "power2.out",
-        },
-        "-=0.2",
-      );
-
-      /*
-       * Ship atmospheric glow.
-       */
-
-      intro.to(
-        shipGlow.current,
-        {
-          opacity: 0.75,
-          duration: 1,
-          ease: "power2.out",
-        },
-        "-=0.7",
-      );
-
-      /*
-       * SCENE 06
-       * Engine startup.
-       */
-
-      intro.to(".engine-core", {
-        backgroundColor: "#67e8f9",
-        boxShadow: "0 0 14px rgba(34,211,238,.9)",
-        duration: 1.5,
-      });
-
-      intro.to(
-        ".engine-glow",
-        {
-          opacity: 0.75,
-          duration: 1,
-        },
-        "-=0.8",
-      );
-
-      /*
-       * Initial flame ignition.
-       */
-
-      intro.to(".engine-flame", {
-        opacity: 0.65,
-        scaleY: 0.45,
-        duration: 1,
-        stagger: 0.08,
-      });
-
-      /*
-       * Start the idle animation only AFTER
-       * the engines have actually started.
-       */
-
-      intro.call(() => {
-        engineIdle.play();
-      });
-
-      /*
-       * Horizon comes alive.
-       */
-
-      intro.to(
-        horizon.current,
-        {
-          opacity: 1,
-          duration: 1.5,
-        },
-        "-=0.8",
-      );
-
-      /* ------------------------------------------------------------------ */
-      /* LAUNCH SCROLL TIMELINE                                              */
-      /* ------------------------------------------------------------------ */
-
-      const launch = gsap.timeline({
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: "+=500",
-          scrub: 2,
-          pin: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-
-          onUpdate: (self) => {
-            if (!scrollProgress.current) return;
-
-            gsap.set(scrollProgress.current, {
-              width: `${Math.max(4, self.progress * 100)}%`,
-            });
-          },
-        },
-      });
-
-      /*
-       * ------------------------------------------------------------------ */
-      /* SCENE 07                                                           */
-      /* Pilot disappears as launch begins.                                 */
-      /* ------------------------------------------------------------------ */
-
-      launch.to(
-        pilotProfile.current,
-        {
+      master
+        .to(welcomePassenger.current, {
           opacity: 0,
           scale: 0.98,
-          y: -12,
-          duration: 0.45,
-        },
-        0,
-      );
-
-      /*
-       * Engine burst.
-       */
-
-      launch.to(
-        ".engine-flame",
-        {
-          opacity: 1,
-          scaleY: 1.8,
-          duration: 0.7,
-          stagger: 0.05,
-          ease: "power3.in",
-        },
-        0,
-      );
-
-      launch.to(
-        ".engine-glow",
-        {
-          opacity: 1,
-          scale: 1.35,
-          duration: 0.8,
+          y: -10,
+          duration: 0.35,
           ease: "power2.in",
-        },
-        0,
-      );
+        })
 
-      /*
-       * Make sure ship remains visible when launch starts.
-       */
-
-      launch.to(
-        ship.current,
-        {
+        .to(pilotProfile.current, {
           opacity: 1,
-          duration: 1.2,
+          scale: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "power3.out",
+        })
+
+        .to(
+          {},
+          {
+            duration: 1,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 04 — SHIP REVEAL                                              */
+      /* ==================================================================== */
+
+      master
+        .to(pilotProfile.current, {
+          opacity: 0,
+          scale: 0.98,
+          y: -10,
+          duration: 0.35,
+          ease: "power2.in",
+        })
+
+        .to(ship.current, {
+          opacity: 1,
+          duration: 0.9,
           ease: "power2.out",
-        },
-        0,
-      );
+        })
 
-      /*
-       * First upward movement.
-       *
-       * This starts from the ship's existing elevated position.
-       */
-
-      launch.to(
-        ship.current,
-        {
-          y: "-=180",
-          scale: 0.62,
-          duration: 2.2,
-          ease: "power2.in",
-        },
-        0.8,
-      );
-
-      /*
-       * Horizon expands and disappears.
-       */
-
-      launch.to(
-        horizon.current,
-        {
-          scaleY: 2.5,
-          opacity: 0,
-          duration: 2,
-          ease: "power2.in",
-        },
-        1,
-      );
-
-      /* ------------------------------------------------------------------ */
-      /* SCENE 08                                                           */
-      /* Deep-space departure.                                               */
-      /* ------------------------------------------------------------------ */
-
-      /*
-       * Stage 1
-       * Ship becomes distant.
-       */
-
-      launch.to(
-        ship.current,
-        {
-          y: "-=180",
-          scale: 0.3,
-          duration: 1.8,
-          ease: "power3.in",
-        },
-        3,
-      );
-
-      /*
-       * Stage 2
-       * Very distant.
-       */
-
-      launch.to(
-        ship.current,
-        {
-          y: "-=120",
-          scale: 0.12,
-          duration: 1.6,
-          ease: "power3.in",
-        },
-        4.8,
-      );
-
-      /*
-       * Stage 3
-       * Tiny spacecraft.
-       */
-
-      launch.to(
-        ship.current,
-        {
-          y: "-=70",
-          scale: 0.035,
-          duration: 1.5,
-          ease: "power4.in",
-        },
-        6.4,
-      );
-
-      /*
-       * Stage 4
-       * Star-like point.
-       */
-
-      launch.to(
-        ship.current,
-        {
-          y: "-=35",
-          scale: 0.008,
-          opacity: 0.85,
+        .to(ship.current, {
+          y: 0,
+          scale: 1,
           duration: 1.2,
-          ease: "power4.in",
-        },
-        7.9,
-      );
+          ease: "power3.out",
+        })
 
-      /*
-       * Final disappearance.
-       */
+        .to(
+          {},
+          {
+            duration: 0.8,
+          },
+        );
 
-      launch.to(
-        ship.current,
-        {
-          scale: 0.001,
+      /* ==================================================================== */
+      /* FRAME 05 — SYSTEM STATUS                                            */
+      /* ==================================================================== */
+
+      master
+        .to(systemStatusPanel.current, {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          ease: "power2.out",
+        })
+
+        .to(".system-status-row", {
+          opacity: 1,
+          x: 0,
+          duration: 0.45,
+          stagger: 0.25,
+          ease: "power2.out",
+        })
+
+        .to(
+          {},
+          {
+            duration: 0.8,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 06 — DESTINATION                                              */
+      /* ==================================================================== */
+
+      master
+        .to(systemStatusPanel.current, {
           opacity: 0,
+          x: -20,
+          duration: 0.4,
+          ease: "power2.in",
+        })
+
+        .to(destinationPanel.current, {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          ease: "power2.out",
+        })
+
+        .to(
+          [
+            destinationName.current,
+            destinationCode.current,
+            destinationDistance.current,
+            destinationStatus.current,
+          ],
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            stagger: 0.15,
+            ease: "power2.out",
+          },
+        )
+
+        .to(destinationBar.current, {
+          width: "100%",
+          duration: 1,
+          ease: "power2.inOut",
+        })
+
+        .to(
+          {},
+          {
+            duration: 0.8,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 07 — NAVIGATION TELEMETRY                                     */
+      /* ==================================================================== */
+
+      master
+        .to(destinationPanel.current, {
+          opacity: 0,
+          x: 20,
+          duration: 0.4,
+          ease: "power2.in",
+        })
+
+        .to(gpsPanel.current, {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+        })
+
+        .to(
+          [
+            gpsCoordinates.current,
+            gpsHeading.current,
+            gpsAltitude.current,
+            gpsVelocity.current,
+            gpsLock.current,
+          ],
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.12,
+            ease: "power2.out",
+          },
+        )
+
+        .to(gpsScan.current, {
+          width: "100%",
+          duration: 1.2,
+          ease: "power2.inOut",
+        })
+
+        .to(
+          {},
+          {
+            duration: 0.8,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 08 — NAVIGATION LIGHTS                                        */
+      /* ==================================================================== */
+
+      master
+        .to(gpsPanel.current, {
+          opacity: 0,
+          y: 15,
+          duration: 0.4,
+          ease: "power2.in",
+        })
+
+        .to(".nav-light-left, .nav-light-right", {
+          opacity: 1,
           duration: 0.7,
-          ease: "power4.in",
-        },
-        9.1,
-      );
+          stagger: 0.15,
+          ease: "power2.out",
+        })
 
-      /*
-       * Engine exhaust fades away.
-       */
+        .to(".ship-light", {
+          opacity: 1,
+          duration: 0.7,
+          ease: "power2.out",
+        })
 
-      launch.to(
-        ".engine-flame",
-        {
-          opacity: 0,
-          scaleY: 0.2,
+        .to(shipGlow.current, {
+          opacity: 0.65,
+          scale: 1,
+          duration: 0.7,
+          ease: "power2.out",
+        })
+
+        .to(
+          {},
+          {
+            duration: 0.8,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 09 — ENGINE INITIALIZATION                                    */
+      /* ==================================================================== */
+
+      master
+        .to(".engine-core", {
+          backgroundColor: "#67e8f9",
+          boxShadow:
+            "0 0 12px rgba(103,232,249,.9), 0 0 28px rgba(59,130,246,.65)",
+          duration: 0.8,
+          stagger: 0.12,
+          ease: "power2.out",
+        })
+
+        .to(".engine-glow", {
+          opacity: 0.75,
+          duration: 0.7,
+          ease: "power2.out",
+        })
+
+        .to(".engine-flame", {
+          opacity: 0.65,
+          scaleY: 0.45,
+          duration: 0.8,
+          stagger: 0.08,
+          ease: "power2.out",
+        })
+
+        .to(
+          {},
+          {
+            duration: 0.8,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 10 — READY FOR LAUNCH                                         */
+      /* ==================================================================== */
+
+      master
+        .to(".engine-flame", {
+          opacity: 1,
+          scaleY: 1,
+          duration: 0.8,
+          ease: "power2.inOut",
+        })
+
+        .to(".engine-glow", {
+          opacity: 1,
+          scale: 1.25,
+          duration: 0.8,
+          ease: "power2.inOut",
+        })
+
+        .to(horizon.current, {
+          opacity: 1,
+          duration: 0.8,
+          ease: "power2.out",
+        })
+
+        .to(
+          {},
+          {
+            duration: 1,
+          },
+        );
+
+      /* ==================================================================== */
+      /* FRAME 11 — DEPARTURE                                                */
+      /* ==================================================================== */
+
+      master
+        .to(".engine-flame", {
+          scaleY: 1.8,
+          opacity: 1,
+          duration: 0.5,
+          ease: "power2.in",
+        })
+
+        .to(
+          ".engine-glow",
+          {
+            scale: 1.5,
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.in",
+          },
+          "<",
+        )
+
+        .to(ship.current, {
+          y: -180,
+          scale: 0.62,
+          duration: 1.5,
+          ease: "power2.in",
+        })
+
+        .to(
+          horizon.current,
+          {
+            scaleY: 2.5,
+            opacity: 0,
+            duration: 1.2,
+            ease: "power2.in",
+          },
+          "<",
+        )
+
+        .to(ship.current, {
+          y: -360,
+          scale: 0.3,
           duration: 1.2,
           ease: "power2.in",
-        },
-        6.8,
-      );
+        })
 
-      /*
-       * Engine glow fades.
-       */
-
-      launch.to(
-        ".engine-glow",
-        {
-          opacity: 0,
-          scale: 0.8,
+        .to(ship.current, {
+          y: -480,
+          scale: 0.12,
           duration: 1,
           ease: "power2.in",
-        },
-        7,
-      );
+        })
 
-      /* ------------------------------------------------------------------ */
-      /* CLEANUP                                                             */
-      /* ------------------------------------------------------------------ */
+        .to(ship.current, {
+          y: -550,
+          scale: 0.035,
+          opacity: 0.85,
+          duration: 0.9,
+          ease: "power2.in",
+        })
 
-      return () => {
-        window.clearInterval(messageTimer);
-
-        intro.kill();
-        engineIdle.kill();
-        launch.kill();
-      };
+        .to(ship.current, {
+          scale: 0.001,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.in",
+        });
     }, root);
 
     return () => {
@@ -1330,61 +1168,73 @@ export default function CinematicHero() {
         text-white
       "
     >
-      {/* FRONT WINDOW / COCKPIT FRAME */}
+      {/* ================================================================== */}
+      {/* FRAME 01 — INITIALIZATION                                         */}
+      {/* ================================================================== */}
+
+      <div
+        ref={initialization}
+        className="absolute inset-0 z-[100] flex items-center justify-center bg-[#02030a]"
+      >
+        <div className="w-[min(420px,80vw)]">
+          <div className="mb-5 flex items-center justify-between font-mono text-[9px] tracking-[0.35em] text-cyan-300/70">
+            <span>SYSTEM INITIALIZATION</span>
+            <span>NX-01</span>
+          </div>
+
+          <div className="relative h-[2px] w-full overflow-hidden bg-white/10">
+            <div
+              ref={initializationBar}
+              className="absolute inset-y-0 left-0 bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,.9)]"
+              style={{ width: "0%" }}
+            />
+          </div>
+
+          <div className="mt-4 flex items-center justify-between font-mono">
+            <div
+              ref={initializationStatus}
+              className="text-[9px] tracking-[0.25em] text-white/40"
+            >
+              INITIALIZING CORE SYSTEM
+            </div>
+
+            <div
+              ref={initializationPercent}
+              className="text-sm tracking-[0.15em] text-cyan-300"
+            >
+              0%
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center gap-2">
+            <span className="h-1 w-1 rounded-full bg-cyan-300" />
+
+            <span className="font-mono text-[8px] tracking-[0.3em] text-white/20">
+              PLEASE WAIT
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ================================================================== */}
+      {/* COCKPIT FRAME                                                      */}
+      {/* ================================================================== */}
+
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
-        {/* Top window frame */}
+        {/* TOP WINDOW FRAME */}
         <div className="absolute left-0 right-0 top-0 h-[90px]">
-          {/* Main neon edge */}
-          <div
-            className="
-        absolute left-0 right-0 top-[54px] h-px
-        bg-cyan-300/70
-        shadow-[0_0_8px_rgba(34,211,238,0.8),0_0_24px_rgba(34,211,238,0.25)]
-      "
-          />
+          <div className="absolute left-0 right-0 top-[54px] h-px bg-cyan-300/70 shadow-[0_0_8px_rgba(34,211,238,0.8),0_0_24px_rgba(34,211,238,0.25)]" />
 
-          {/* Secondary line */}
-          <div
-            className="
-        absolute left-[8%] right-[8%] top-[58px] h-px
-        bg-violet-400/25
-        shadow-[0_0_10px_rgba(139,92,246,0.4)]
-      "
-          />
+          <div className="absolute left-[8%] right-[8%] top-[58px] h-px bg-violet-400/25 shadow-[0_0_10px_rgba(139,92,246,0.4)]" />
 
-          {/* Left angled support */}
-          <div
-            className="
-        absolute left-0 top-[54px]
-        h-[35px] w-[14%]
-        border-r border-t border-cyan-300/40
-        [clip-path:polygon(0_0,100%_0,86%_100%,0_100%)]
-      "
-          />
+          <div className="absolute left-0 top-[54px] h-[35px] w-[14%] border-r border-t border-cyan-300/40 [clip-path:polygon(0_0,100%_0,86%_100%,0_100%)]" />
 
-          {/* Right angled support */}
-          <div
-            className="
-        absolute right-0 top-[54px]
-        h-[35px] w-[14%]
-        border-l border-t border-cyan-300/40
-        [clip-path:polygon(0_0,100%_0,100%_100%,14%_100%)]
-      "
-          />
+          <div className="absolute right-0 top-[54px] h-[35px] w-[14%] border-l border-t border-cyan-300/40 [clip-path:polygon(0_0,100%_0,100%_100%,14%_100%)]" />
 
-          {/* Center window marker */}
-          <div
-            className="
-        absolute left-1/2 top-[48px]
-        h-[13px] w-[110px]
-        -translate-x-1/2
-        border-x border-cyan-300/50
-      "
-          >
+          <div className="absolute left-1/2 top-[48px] h-[13px] w-[110px] -translate-x-1/2 border-x border-cyan-300/50">
             <div className="absolute left-1/2 top-0 h-[2px] w-[42px] -translate-x-1/2 bg-cyan-300/80 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
           </div>
 
-          {/* Technical ticks */}
           <div className="absolute left-[18%] top-[51px] flex gap-2">
             <span className="h-[7px] w-px bg-cyan-300/50" />
             <span className="h-[4px] w-px bg-cyan-300/30" />
@@ -1400,10 +1250,7 @@ export default function CinematicHero() {
           </div>
         </div>
 
-        {/* ------------------------------------------------------------------ */}
-        {/* TOP HUD                                                             */}
-        {/* ------------------------------------------------------------------ */}
-
+        {/* TOP HUD */}
         <header className="absolute left-0 right-0 top-10 z-40 px-6 py-6 md:px-10">
           <div className="flex items-start justify-between">
             <div>
@@ -1419,91 +1266,29 @@ export default function CinematicHero() {
             <button
               type="button"
               onClick={() => setAudioOn((value) => !value)}
-              className="
-              font-mono
-              text-[9px]
-              tracking-[0.25em]
-              text-white/50
-              transition
-              hover:text-cyan-300
-            "
+              className="font-mono text-[9px] tracking-[0.25em] text-white/50 transition hover:text-cyan-300"
             >
               AUDIO SYSTEM // {audioOn ? "ONLINE" : "OFFLINE"}
             </button>
           </div>
         </header>
 
-        {/* Bottom window frame */}
+        {/* BOTTOM WINDOW FRAME */}
         <div className="absolute bottom-0 left-0 right-0 h-[120px]">
-          {/* Main bottom neon edge */}
-          <div
-            className="
-        absolute bottom-[55px] left-0 right-0 h-px
-        bg-cyan-300/60
-        shadow-[0_0_10px_rgba(34,211,238,0.7),0_0_30px_rgba(34,211,238,0.2)]
-      "
-          />
+          <div className="absolute bottom-[55px] left-0 right-0 h-px bg-cyan-300/60 shadow-[0_0_10px_rgba(34,211,238,0.7),0_0_30px_rgba(34,211,238,0.2)]" />
 
-          {/* Violet secondary line */}
-          <div
-            className="
-        absolute bottom-[51px] left-[10%] right-[10%] h-px
-        bg-violet-400/25
-        shadow-[0_0_12px_rgba(139,92,246,0.35)]
-      "
-          />
+          <div className="absolute bottom-[51px] left-[10%] right-[10%] h-px bg-violet-400/25 shadow-[0_0_12px_rgba(139,92,246,0.35)]" />
 
-          {/* Bottom cockpit structure */}
-          <div
-            className="
-        absolute bottom-0 left-0 right-0 h-[58px]
-        border-t border-white/5
-        bg-gradient-to-t from-black/60 to-transparent
-        backdrop-blur-[2px]
-      "
-          />
+          <div className="absolute bottom-0 left-0 right-0 h-[58px] border-t border-white/5 bg-gradient-to-t from-black/60 to-transparent backdrop-blur-[2px]" />
 
-          {/* Left angled support */}
-          <div
-            className="
-        absolute bottom-[55px] left-0
-        h-[42px] w-[18%]
-        border-r border-b border-cyan-300/35
-        [clip-path:polygon(0_0,100%_0,86%_100%,0_100%)]
-      "
-          />
+          <div className="absolute bottom-[55px] left-0 h-[42px] w-[18%] border-r border-b border-cyan-300/35 [clip-path:polygon(0_0,100%_0,86%_100%,0_100%)]" />
 
-          {/* Right angled support */}
-          <div
-            className="
-        absolute bottom-[55px] right-0
-        h-[42px] w-[18%]
-        border-l border-b border-cyan-300/35
-        [clip-path:polygon(0_0,100%_0,100%_100%,14%_100%)]
-      "
-          />
+          <div className="absolute bottom-[55px] right-0 h-[42px] w-[18%] border-l border-b border-cyan-300/35 [clip-path:polygon(0_0,100%_0,100%_100%,14%_100%)]" />
 
-          {/* Center cockpit console seam */}
-          <div
-            className="
-        absolute bottom-[55px] left-1/2
-        h-[18px] w-[180px]
-        -translate-x-1/2
-        border-x border-cyan-300/30
-      "
-          >
-            <div
-              className="
-          absolute bottom-0 left-1/2
-          h-px w-[70px]
-          -translate-x-1/2
-          bg-cyan-300/70
-          shadow-[0_0_10px_rgba(34,211,238,0.9)]
-        "
-            />
+          <div className="absolute bottom-[55px] left-1/2 h-[18px] w-[180px] -translate-x-1/2 border-x border-cyan-300/30">
+            <div className="absolute bottom-0 left-1/2 h-px w-[70px] -translate-x-1/2 bg-cyan-300/70 shadow-[0_0_10px_rgba(34,211,238,0.9)]" />
           </div>
 
-          {/* Bottom technical ticks */}
           <div className="absolute bottom-[51px] left-[22%] flex gap-2">
             <span className="h-[7px] w-px bg-cyan-300/40" />
             <span className="h-[4px] w-px bg-cyan-300/25" />
@@ -1519,49 +1304,26 @@ export default function CinematicHero() {
           </div>
         </div>
 
-        {/* Subtle glass reflection */}
-        <div
-          className="
-      absolute inset-0
-      bg-[linear-gradient(115deg,transparent_0%,rgba(255,255,255,0.025)_42%,transparent_48%,transparent_100%)]
-      opacity-60
-    "
-        />
+        {/* Glass reflection */}
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,transparent_0%,rgba(255,255,255,0.025)_42%,transparent_48%,transparent_100%)] opacity-60" />
       </div>
+
+      {/* ================================================================== */}
+      {/* FRAME 07 — NAVIGATION TELEMETRY                                   */}
+      {/* ================================================================== */}
 
       <div
         ref={gpsPanel}
-        className="
-    absolute bottom-[82px] left-1/2 z-30
-    hidden w-[420px]
-    -translate-x-1/2
-    md:block
-  "
+        className="absolute bottom-[82px] left-1/2 z-30 hidden w-[420px] -translate-x-1/2 md:block"
       >
-        <div
-          className="
-      relative
-      border border-white/10
-      bg-black/10
-      p-4
-      backdrop-blur-sm
-       left-1/2 top-[-100%] -translate-x-1/2 -translate-y-1/2
-    "
-        >
+        <div className="relative border border-white/10 bg-black/10 p-4 backdrop-blur-sm">
           <HudCorners />
 
-          {/* HEADER */}
           <div className="flex items-center justify-between">
             <HudLabel>NAVIGATION TELEMETRY</HudLabel>
 
             <div className="flex items-center gap-2">
-              <span
-                className="
-            h-1.5 w-1.5 rounded-full
-            bg-cyan-300
-            shadow-[0_0_8px_rgba(34,211,238,0.9)]
-          "
-              />
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
 
               <span className="font-mono text-[6px] tracking-[0.16em] text-cyan-300/70">
                 NAV ONLINE
@@ -1569,7 +1331,6 @@ export default function CinematicHero() {
             </div>
           </div>
 
-          {/* NAVIGATION VECTOR */}
           <div ref={gpsCoordinates} className="mt-4">
             <div className="font-mono text-[6px] tracking-[0.18em] text-white/30">
               NAVIGATION VECTOR
@@ -1581,9 +1342,7 @@ export default function CinematicHero() {
             </div>
           </div>
 
-          {/* TELEMETRY */}
           <div className="mt-4 grid grid-cols-3 gap-4">
-            {/* HEADING */}
             <div ref={gpsHeading} className="min-w-0">
               <div className="font-mono text-[6px] tracking-[0.16em] text-white/30">
                 HEADING
@@ -1594,7 +1353,6 @@ export default function CinematicHero() {
               </div>
             </div>
 
-            {/* ALTITUDE */}
             <div ref={gpsAltitude} className="min-w-0">
               <div className="font-mono text-[6px] tracking-[0.16em] text-white/30">
                 FLIGHT LEVEL
@@ -1605,7 +1363,6 @@ export default function CinematicHero() {
               </div>
             </div>
 
-            {/* VELOCITY */}
             <div ref={gpsVelocity} className="min-w-0">
               <div className="font-mono text-[6px] tracking-[0.16em] text-white/30">
                 VELOCITY
@@ -1617,7 +1374,6 @@ export default function CinematicHero() {
             </div>
           </div>
 
-          {/* NAVIGATION LOCK */}
           <div ref={gpsLock} className="mt-4">
             <div className="mb-1 flex items-center justify-between">
               <span className="font-mono text-[6px] tracking-[0.18em] text-white/30">
@@ -1632,17 +1388,11 @@ export default function CinematicHero() {
             <div className="relative h-[2px] w-full overflow-hidden bg-white/10">
               <div
                 ref={gpsScan}
-                className="
-            absolute inset-y-0 left-0
-            w-0
-            bg-cyan-400
-            shadow-[0_0_8px_rgba(34,211,238,0.8)]
-          "
+                className="absolute inset-y-0 left-0 w-0 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"
               />
             </div>
           </div>
 
-          {/* SYSTEM READOUT */}
           <div className="mt-3 flex items-center justify-between">
             <span className="font-mono text-[5px] tracking-[0.18em] text-white/20">
               SAT-LINK 08
@@ -1659,114 +1409,39 @@ export default function CinematicHero() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* CENTER TITLE                                                        */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
+      {/* FRAME 05 — SYSTEM STATUS                                          */}
+      {/* ================================================================== */}
 
-      <div className="absolute left-1/2 top-[11%] z-30 -translate-x-1/2 text-center">
-        <HudLabel>MISSION 001</HudLabel>
-
-        <h1 className="mt-3 text-2xl font-light tracking-[0.35em] text-white/90 md:text-4xl">
-          BEYOND THE HORIZON
-        </h1>
-
-        <p className="mt-3 font-mono text-[9px] tracking-[0.3em] text-white/35">
-          DEEP SPACE EXPLORATION PROTOCOL
-        </p>
-      </div>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* LEFT SYSTEM HUD                                                     */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div
-        className="
-          absolute
-          left-6
-          top-1/2
-          z-30
-          hidden
-          w-[230px]
-          -translate-y-1/2
-          md:block
-        "
-      >
-        <div className="relative border border-white/10 bg-black/10 p-5 backdrop-blur-sm">
+      <div className="absolute left-6 top-1/2 z-30 hidden w-[230px] -translate-y-1/2 md:block">
+        <div
+          ref={systemStatusPanel}
+          className="system-status-panel relative border border-white/10 bg-black/10 p-5 backdrop-blur-sm"
+        >
           <HudCorners />
 
           <HudLabel>SYSTEM STATUS</HudLabel>
 
           <div className="mt-5 space-y-4">
-            {bootMessages.map((system, index) => (
-              <div key={`${system.name}-${index}`} className="system-row">
-                {/* System name + percentage */}
-                <div className="mb-1.5 flex items-center justify-between">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span
-                      className="
-              h-1.5
-              w-1.5
-              shrink-0
-              rounded-full
-              bg-cyan-300
-              shadow-[0_0_8px_#22d3ee]
-            "
-                    />
+            {systemSequence.map((system) => (
+              <div key={system.name} className="system-status-row opacity-0">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[9px] tracking-[0.15em] text-white/50">
+                    {system.name}
+                  </span>
 
-                    <span className="truncate font-mono text-[7px] tracking-[0.12em] text-white/55">
-                      {system.name}
-                    </span>
-                  </div>
-
-                  <span className="ml-2 shrink-0 font-mono text-[7px] tracking-[0.1em] text-cyan-300/80">
-                    {system.percent}%
+                  <span className="font-mono text-[9px] tracking-[0.15em] text-cyan-300">
+                    {system.label}
                   </span>
                 </div>
 
-                {/* Animated diagnostic bar */}
-                <div className="flex items-center gap-2">
-                  <div className="relative h-[4px] flex-1 overflow-hidden bg-white/[0.06]">
-                    <div
-                      className="
-              system-bar
-              absolute
-              inset-y-0
-              left-0
-              bg-cyan-400/70
-              shadow-[0_0_8px_rgba(34,211,238,0.65)]
-            "
-                      style={{
-                        width: `${system.percent}%`,
-                        transformOrigin: "left center",
-                      }}
-                    />
-
-                    {/* Moving scanner */}
-                    <div
-                      className="
-              absolute
-              inset-y-0
-              left-0
-              w-[18px]
-              bg-white/60
-              blur-[3px]
-              animate-[systemScan_1.8s_linear_infinite]
-            "
-                    />
-                  </div>
-
-                  <span
-                    className={`
-            w-[42px]
-            text-right
-            font-mono
-            text-[6px]
-            tracking-[0.08em]
-            ${system.percent >= 95 ? "text-cyan-300" : "text-white/30"}
-          `}
-                  >
-                    {system.label}
-                  </span>
+                <div className="mt-2 h-[2px] w-full bg-white/10">
+                  <div
+                    className="system-status-progress h-full bg-cyan-300"
+                    style={{
+                      width: `${system.percent}%`,
+                    }}
+                  />
                 </div>
               </div>
             ))}
@@ -1774,152 +1449,116 @@ export default function CinematicHero() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* RIGHT DESTINATION HUD                                               */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
+      {/* FRAME 06 — DESTINATION                                             */}
+      {/* ================================================================== */}
 
       <div
         ref={destinationPanel}
-        className="
-    absolute right-6 top-1/2 z-30
-    hidden w-[230px] -translate-y-1/2
-    md:block
-  "
+        className="absolute right-6 top-1/2 z-30 hidden w-[230px] -translate-y-1/2 md:block"
       >
         <div className="relative border border-white/10 bg-black/10 p-5 backdrop-blur-sm">
           <HudCorners />
 
           <HudLabel>DESTINATION</HudLabel>
 
-          {selectedDestination && (
+          <div className="mt-5">
+            <div
+              ref={destinationName}
+              className="font-mono text-[13px] font-semibold tracking-[0.18em] text-white"
+            >
+              {selectedDestination.name}
+            </div>
+
+            <div
+              ref={destinationCode}
+              className="mt-1 font-mono text-[7px] tracking-[0.22em] text-cyan-300/60"
+            >
+              TARGET // {selectedDestination.code}
+            </div>
+
+            <div ref={destinationDistance} className="mt-5">
+              <div className="font-mono text-[7px] tracking-[0.18em] text-white/35">
+                DISTANCE
+              </div>
+
+              <div className="mt-1 font-mono text-[18px] tracking-[0.08em] text-cyan-300">
+                {selectedDestination.distance}
+              </div>
+            </div>
+
             <div className="mt-5">
-              {/* Destination name */}
-              <div
-                ref={destinationName}
-                className="
-            font-mono text-[13px] font-semibold
-            tracking-[0.18em] text-white
-          "
-              >
-                {selectedDestination.name}
+              <div className="mb-1 flex items-center justify-between">
+                <span className="font-mono text-[6px] tracking-[0.18em] text-white/35">
+                  NAVIGATION LOCK
+                </span>
+
+                <span
+                  ref={destinationStatus}
+                  className="font-mono text-[6px] tracking-[0.16em] text-cyan-300"
+                >
+                  {selectedDestination.status}
+                </span>
               </div>
 
-              {/* Destination code */}
-              <div
-                ref={destinationCode}
-                className="
-            mt-1 font-mono text-[7px]
-            tracking-[0.22em] text-cyan-300/60
-          "
-              >
-                TARGET // {selectedDestination.code}
+              <div className="relative h-[2px] w-full overflow-hidden bg-white/10">
+                <div
+                  ref={destinationBar}
+                  className="absolute inset-y-0 left-0 w-0 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"
+                />
               </div>
+            </div>
 
-              {/* Distance */}
-              <div ref={destinationDistance} className="mt-5">
-                <div className="font-mono text-[7px] tracking-[0.18em] text-white/35">
-                  DISTANCE
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div>
+                <div className="font-mono text-[6px] tracking-[0.15em] text-white/25">
+                  VECTOR
                 </div>
 
-                <div className="mt-1 font-mono text-[18px] tracking-[0.08em] text-cyan-300">
-                  {selectedDestination.distance}
-                </div>
-              </div>
-
-              {/* Navigation scan bar */}
-              <div className="mt-5">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="font-mono text-[6px] tracking-[0.18em] text-white/35">
-                    NAVIGATION LOCK
-                  </span>
-
-                  <span
-                    ref={destinationStatus}
-                    className="
-                font-mono text-[6px]
-                tracking-[0.16em] text-cyan-300
-              "
-                  >
-                    {selectedDestination.status}
-                  </span>
-                </div>
-
-                <div className="relative h-[2px] w-full overflow-hidden bg-white/10">
-                  <div
-                    ref={destinationBar}
-                    className="
-                absolute inset-y-0 left-0
-                w-0 bg-cyan-400
-                shadow-[0_0_8px_rgba(34,211,238,0.8)]
-              "
-                  />
+                <div className="mt-1 font-mono text-[7px] tracking-[0.1em] text-white/60">
+                  LOCKED
                 </div>
               </div>
 
-              {/* Coordinate-style readout */}
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div>
-                  <div className="font-mono text-[6px] tracking-[0.15em] text-white/25">
-                    VECTOR
-                  </div>
-                  <div className="mt-1 font-mono text-[7px] tracking-[0.1em] text-white/60">
-                    LOCKED
-                  </div>
+              <div>
+                <div className="font-mono text-[6px] tracking-[0.15em] text-white/25">
+                  COURSE
                 </div>
 
-                <div>
-                  <div className="font-mono text-[6px] tracking-[0.15em] text-white/25">
-                    COURSE
-                  </div>
-                  <div className="mt-1 font-mono text-[7px] tracking-[0.1em] text-white/60">
-                    AUTO
-                  </div>
+                <div className="mt-1 font-mono text-[7px] tracking-[0.1em] text-white/60">
+                  AUTO
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* WELCOME                                                             */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
+      {/* FRAME 02 — WELCOME                                                 */}
+      {/* ================================================================== */}
 
       <div
         ref={welcomePassenger}
-        className="
-          absolute
-          left-1/2
-          top-1/2
-          z-[36]
-          -translate-x-1/2
-          -translate-y-1/2
-        "
+        className="absolute left-1/2 top-1/2 z-[36] -translate-x-1/2 -translate-y-1/2"
       >
         <WelcomePassenger />
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* PILOT PROFILE                                                       */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
+      {/* FRAME 03 — PILOT                                                   */}
+      {/* ================================================================== */}
 
       <div
         ref={pilotProfile}
-        className="
-          absolute
-          left-1/2
-          top-1/2
-          z-[35]
-          -translate-x-1/2
-          -translate-y-1/2
-        "
+        className="absolute left-1/2 top-1/2 z-[35] -translate-x-1/2 -translate-y-1/2"
       >
         <PilotProfile />
       </div>
 
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
       {/* HORIZON                                                             */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
 
       <div
         ref={horizon}
@@ -1940,37 +1579,25 @@ export default function CinematicHero() {
         "
       />
 
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
       {/* SPACECRAFT                                                          */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
 
       <div
         ref={ship}
-        className="
-          absolute
-          left-1/2
-          top-[57%]
-          z-20
-          -translate-x-1/2
-        "
+        className="absolute left-1/2 top-[57%] z-20 -translate-x-1/2"
       >
         <div
           ref={shipGlow}
-          className="
-            absolute
-            inset-0
-            rounded-full
-            bg-cyan-400/10
-            blur-[70px]
-          "
+          className="absolute inset-0 rounded-full bg-cyan-400/10 blur-[70px]"
         />
 
         <Spacecraft />
       </div>
 
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
       {/* BOTTOM HUD                                                          */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
 
       <div className="absolute bottom-20 left-0 right-0 z-40 px-6 md:px-10">
         <div className="flex items-end justify-between">
@@ -1982,7 +1609,6 @@ export default function CinematicHero() {
             </div>
           </div>
 
-          {/* Scroll indicator */}
           <div className="mx-auto mt-5 flex w-[160px] flex-col items-center">
             <div className="font-mono text-[7px] tracking-[0.35em] text-white/25">
               SCROLL TO LAUNCH
@@ -1991,12 +1617,7 @@ export default function CinematicHero() {
             <div className="mt-3 h-[1px] w-full overflow-hidden bg-white/10">
               <div
                 ref={scrollProgress}
-                className="
-                h-full
-                w-[4%]
-                bg-cyan-300/70
-                shadow-[0_0_8px_rgba(34,211,238,0.7)]
-              "
+                className="h-full w-[4%] bg-cyan-300/70 shadow-[0_0_8px_rgba(34,211,238,0.7)]"
               />
             </div>
           </div>
@@ -2011,35 +1632,17 @@ export default function CinematicHero() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* CINEMATIC VIGNETTE                                                  */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
+      {/* VIGNETTE                                                            */}
+      {/* ================================================================== */}
 
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          z-50
-          bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,.55)_100%)]
-        "
-      />
+      <div className="pointer-events-none absolute inset-0 z-50 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,.55)_100%)]" />
 
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
       {/* SCANLINES                                                           */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ================================================================== */}
 
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          z-50
-          opacity-[0.025]
-          [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px)]
-          [background-size:100%_4px]
-        "
-      />
+      <div className="pointer-events-none absolute inset-0 z-50 opacity-[0.025] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:100%_4px]" />
     </main>
   );
 }
