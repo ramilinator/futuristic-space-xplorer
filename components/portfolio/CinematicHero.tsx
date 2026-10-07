@@ -5,6 +5,10 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+type CinematicHeroProps = {
+  onTimelineComplete?: () => void;
+};
+
 gsap.registerPlugin(ScrollTrigger);
 
 type SystemStatus = {
@@ -486,8 +490,14 @@ function PilotProfile() {
 /* CINEMATIC HERO                                                             */
 /* -------------------------------------------------------------------------- */
 
-export default function CinematicHero() {
+export default function CinematicHero({
+  onTimelineComplete,
+}: CinematicHeroProps) {
   const root = useRef<HTMLElement>(null);
+
+  const introFlash = useRef<HTMLDivElement>(null);
+  const introBloom = useRef<HTMLDivElement>(null);
+  const introBlackout = useRef<HTMLDivElement>(null);
 
   const initialization = useRef<HTMLDivElement>(null);
   const initializationBar = useRef<HTMLDivElement>(null);
@@ -526,6 +536,24 @@ export default function CinematicHero() {
     if (!root.current) return;
 
     const ctx = gsap.context(() => {
+      /* -------------------------------------------------------------------- */
+      /* CINEMATIC OPENING FLASH                                              */
+      /* -------------------------------------------------------------------- */
+
+      gsap.set(introBlackout.current, {
+        opacity: 1,
+      });
+
+      gsap.set(introFlash.current, {
+        opacity: 0,
+        scale: 0.2,
+      });
+
+      gsap.set(introBloom.current, {
+        opacity: 0,
+        scale: 0.15,
+      });
+
       /* -------------------------------------------------------------------- */
       /* INITIAL STATE                                                        */
       /* -------------------------------------------------------------------- */
@@ -679,6 +707,8 @@ export default function CinematicHero() {
         value: 0,
       };
 
+      let navbarShown = false;
+
       const master = gsap.timeline({
         scrollTrigger: {
           trigger: root.current,
@@ -695,9 +725,95 @@ export default function CinematicHero() {
                 width: `${Math.max(4, self.progress * 100)}%`,
               });
             }
+            if (self.progress >= 0.999 && !navbarShown) {
+              navbarShown = true;
+              onTimelineComplete?.();
+            }
           },
         },
       });
+
+      /* ==================================================================== */
+      /* CINEMATIC OPENING                                                    */
+      /* ==================================================================== */
+
+      master
+        /* Absolute darkness */
+        .set(introBlackout.current, {
+          opacity: 1,
+        })
+
+        .set(introFlash.current, {
+          opacity: 0,
+          scale: 0.2,
+        })
+
+        .set(introBloom.current, {
+          opacity: 0,
+          scale: 0.15,
+        })
+
+        /* -------------------------------------------------------------- */
+        /* THE BOOM                                                       */
+        /* -------------------------------------------------------------- */
+
+        .to(introFlash.current, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.12,
+          ease: "power4.out",
+        })
+
+        .to(
+          introBloom.current,
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.2,
+            ease: "power4.out",
+          },
+          "<",
+        )
+
+        /* -------------------------------------------------------------- */
+        /* FLASH COLLAPSE                                                 */
+        /* -------------------------------------------------------------- */
+
+        .to(introFlash.current, {
+          opacity: 0,
+          scale: 1.8,
+          duration: 0.65,
+          ease: "power2.out",
+        })
+
+        .to(
+          introBloom.current,
+          {
+            opacity: 0.25,
+            scale: 1.8,
+            duration: 0.9,
+            ease: "power2.out",
+          },
+          "<",
+        )
+
+        /* -------------------------------------------------------------- */
+        /* REVEAL THE STARFIELD                                           */
+        /* -------------------------------------------------------------- */
+
+        .to(introBlackout.current, {
+          opacity: 0,
+          duration: 1.8,
+          ease: "power2.out",
+        })
+
+        /* Small cinematic pause */
+        .to(
+          {},
+          {
+            duration: 0.35,
+          },
+        );
 
       /* ==================================================================== */
       /* FRAME 01 — SYSTEM INITIALIZATION                                    */
@@ -1169,57 +1285,158 @@ export default function CinematicHero() {
       "
     >
       {/* ================================================================== */}
-      {/* FRAME 01 — INITIALIZATION                                         */}
+      {/* CINEMATIC OPENING                                                  */}
       {/* ================================================================== */}
 
+      {/* Absolute darkness */}
+      <div
+        ref={introBlackout}
+        className="
+    pointer-events-none
+    absolute
+    inset-0
+    z-[1000]
+    bg-[#000]
+  "
+      />
+
+      {/* Sudden white/cyan explosion */}
+      <div
+        ref={introFlash}
+        className="
+    pointer-events-none
+    absolute
+    left-1/2
+    top-1/2
+    z-[1001]
+    h-[35vh]
+    w-[35vh]
+    -translate-x-1/2
+    -translate-y-1/2
+    rounded-full
+    bg-white
+    opacity-0
+    blur-[8px]
+    shadow-[0_0_80px_rgba(255,255,255,1),0_0_180px_rgba(103,232,249,1),0_0_320px_rgba(59,130,246,.8)]
+  "
+      />
+
+      {/* Large atmospheric bloom */}
+      <div
+        ref={introBloom}
+        className="
+    pointer-events-none
+    absolute
+    left-1/2
+    top-1/2
+    z-[1000]
+    h-[80vh]
+    w-[80vh]
+    -translate-x-1/2
+    -translate-y-1/2
+    rounded-full
+    bg-cyan-300/20
+    opacity-0
+    blur-[100px]
+  "
+      />
+
+      {/* ================================================================== */}
+      {/* FRAME 01 — INITIALIZATION                                         */}
+      {/* ================================================================== */}
       <div
         ref={initialization}
-        className="absolute inset-0 z-[100] flex items-center justify-center bg-[#02030a]"
+        className="absolute inset-0 z-[100] flex items-center justify-center px-6"
       >
-        <div className="w-[min(420px,80vw)]">
-          <div className="mb-5 flex items-center justify-between font-mono text-[9px] tracking-[0.35em] text-cyan-300/70">
-            <span>SYSTEM INITIALIZATION</span>
-            <span>NX-01</span>
-          </div>
+        <div className="relative w-[min(520px,calc(100vw-48px))]">
+          <div
+            className="
+        relative
+        border border-white/10
+        bg-black/10
+        p-6
+        backdrop-blur-sm
+        sm:p-8
+      "
+          >
+            <HudCorners />
 
-          <div className="relative h-[2px] w-full overflow-hidden bg-white/10">
-            <div
-              ref={initializationBar}
-              className="absolute inset-y-0 left-0 bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,.9)]"
-              style={{ width: "0%" }}
-            />
-          </div>
+            {/* Top accent line */}
+            <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent" />
 
-          <div className="mt-4 flex items-center justify-between font-mono">
-            <div
-              ref={initializationStatus}
-              className="text-[9px] tracking-[0.25em] text-white/40"
-            >
-              INITIALIZING CORE SYSTEM
+            {/* Header */}
+            <div className="mb-6 flex items-center justify-between border-b border-cyan-300/10 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.9)]" />
+
+                <span className="font-mono text-[9px] tracking-[0.3em] text-cyan-300">
+                  SYSTEM INITIALIZATION
+                </span>
+              </div>
+
+              <span className="font-mono text-[8px] tracking-[0.25em] text-cyan-300/40">
+                NX-01
+              </span>
             </div>
 
-            <div
-              ref={initializationPercent}
-              className="text-sm tracking-[0.15em] text-cyan-300"
-            >
-              0%
+            {/* Status */}
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="font-mono text-[7px] tracking-[0.25em] text-white/30">
+                  CORE STATUS
+                </div>
+
+                <div
+                  ref={initializationStatus}
+                  className="mt-2 font-mono text-[9px] tracking-[0.2em] text-white/60"
+                >
+                  INITIALIZING CORE SYSTEM
+                </div>
+              </div>
+
+              <div
+                ref={initializationPercent}
+                className="font-mono text-xl tracking-[0.08em] text-cyan-300"
+              >
+                0%
+              </div>
             </div>
-          </div>
 
-          <div className="mt-6 flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-cyan-300" />
+            {/* Progress bar */}
+            <div className="mt-5 relative h-[2px] w-full overflow-hidden bg-white/10">
+              <div
+                ref={initializationBar}
+                className="
+            absolute
+            inset-y-0
+            left-0
+            bg-cyan-300
+            shadow-[0_0_12px_rgba(103,232,249,.9)]
+          "
+                style={{ width: "0%" }}
+              />
+            </div>
 
-            <span className="font-mono text-[8px] tracking-[0.3em] text-white/20">
-              PLEASE WAIT
-            </span>
+            {/* Footer */}
+            <div className="mt-5 flex items-center justify-between border-t border-cyan-300/10 pt-3">
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#22d3ee]" />
+
+                <span className="font-mono text-[7px] tracking-[0.25em] text-white/25">
+                  CORE BOOT SEQUENCE
+                </span>
+              </div>
+
+              <span className="font-mono text-[7px] tracking-[0.25em] text-cyan-300/40">
+                PLEASE WAIT
+              </span>
+            </div>
           </div>
         </div>
       </div>
-
       {/* ================================================================== */}
       {/* COCKPIT FRAME                                                      */}
       {/* ================================================================== */}
-
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
         {/* TOP WINDOW FRAME */}
         <div className="absolute left-0 right-0 top-0 h-[90px]">
@@ -1307,11 +1524,9 @@ export default function CinematicHero() {
         {/* Glass reflection */}
         <div className="absolute inset-0 bg-[linear-gradient(115deg,transparent_0%,rgba(255,255,255,0.025)_42%,transparent_48%,transparent_100%)] opacity-60" />
       </div>
-
       {/* ================================================================== */}
       {/* FRAME 07 — NAVIGATION TELEMETRY                                   */}
       {/* ================================================================== */}
-
       <div
         ref={gpsPanel}
         className="absolute bottom-[82px] left-1/2 z-30 hidden w-[420px] -translate-x-1/2 md:block"
@@ -1408,11 +1623,9 @@ export default function CinematicHero() {
           </div>
         </div>
       </div>
-
       {/* ================================================================== */}
       {/* FRAME 05 — SYSTEM STATUS                                          */}
       {/* ================================================================== */}
-
       <div className="absolute left-6 top-1/2 z-30 hidden w-[230px] -translate-y-1/2 md:block">
         <div
           ref={systemStatusPanel}
@@ -1448,11 +1661,9 @@ export default function CinematicHero() {
           </div>
         </div>
       </div>
-
       {/* ================================================================== */}
       {/* FRAME 06 — DESTINATION                                             */}
       {/* ================================================================== */}
-
       <div
         ref={destinationPanel}
         className="absolute right-6 top-1/2 z-30 hidden w-[230px] -translate-y-1/2 md:block"
@@ -1533,33 +1744,27 @@ export default function CinematicHero() {
           </div>
         </div>
       </div>
-
       {/* ================================================================== */}
       {/* FRAME 02 — WELCOME                                                 */}
       {/* ================================================================== */}
-
       <div
         ref={welcomePassenger}
         className="absolute left-1/2 top-1/2 z-[36] -translate-x-1/2 -translate-y-1/2"
       >
         <WelcomePassenger />
       </div>
-
       {/* ================================================================== */}
       {/* FRAME 03 — PILOT                                                   */}
       {/* ================================================================== */}
-
       <div
         ref={pilotProfile}
         className="absolute left-1/2 top-1/2 z-[35] -translate-x-1/2 -translate-y-1/2"
       >
         <PilotProfile />
       </div>
-
       {/* ================================================================== */}
       {/* HORIZON                                                             */}
       {/* ================================================================== */}
-
       <div
         ref={horizon}
         className="
@@ -1578,11 +1783,9 @@ export default function CinematicHero() {
           blur-[1px]
         "
       />
-
       {/* ================================================================== */}
       {/* SPACECRAFT                                                          */}
       {/* ================================================================== */}
-
       <div
         ref={ship}
         className="absolute left-1/2 top-[57%] z-20 -translate-x-1/2"
@@ -1594,11 +1797,9 @@ export default function CinematicHero() {
 
         <Spacecraft />
       </div>
-
       {/* ================================================================== */}
       {/* BOTTOM HUD                                                          */}
       {/* ================================================================== */}
-
       <div className="absolute bottom-20 left-0 right-0 z-40 px-6 md:px-10">
         <div className="flex items-end justify-between">
           <div>
@@ -1631,17 +1832,13 @@ export default function CinematicHero() {
           </div>
         </div>
       </div>
-
       {/* ================================================================== */}
       {/* VIGNETTE                                                            */}
       {/* ================================================================== */}
-
       <div className="pointer-events-none absolute inset-0 z-50 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,.55)_100%)]" />
-
       {/* ================================================================== */}
       {/* SCANLINES                                                           */}
       {/* ================================================================== */}
-
       <div className="pointer-events-none absolute inset-0 z-50 opacity-[0.025] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:100%_4px]" />
     </main>
   );
